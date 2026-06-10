@@ -64,7 +64,7 @@ Take-Screenshot "4_new_feed_merged.png"
 
 # 6. Close the application gracefully
 Write-Output "Closing application..."
-[System.Windows.Forms.SendKeys]::SendWait("%{F4}") # Send Alt+F4
+$process.CloseMainWindow() | Out-Null
 Start-Sleep -Seconds 2
 
 # Force terminate if still running
