@@ -8,9 +8,9 @@
 #define new DEBUG_NEW
 #endif
 
-IMPLEMENT_DYNCREATE(CArticleView, CEditView)
+IMPLEMENT_DYNCREATE(CArticleView, CHtmlView)
 
-BEGIN_MESSAGE_MAP(CArticleView, CEditView)
+BEGIN_MESSAGE_MAP(CArticleView, CHtmlView)
 END_MESSAGE_MAP()
 
 CArticleView::CArticleView() noexcept
@@ -26,89 +26,154 @@ CArticleView::~CArticleView()
 BOOL CArticleView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow start");
-	if (!CEditView::PreCreateWindow(cs))
+	if (!CHtmlView::PreCreateWindow(cs))
 	{
 		WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow failed");
 		return FALSE;
 	}
-
-	// Multi-line, read-only edit control with scrolling
-	cs.style |= ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL;
 	WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow succeeded");
 	return TRUE;
 }
 
 void CArticleView::OnInitialUpdate()
 {
-	CEditView::OnInitialUpdate();
-
-	// Create and set a premium, highly readable modern font (Segoe UI, 10pt)
-	if (m_font.GetSafeHandle() == NULL)
-	{
-		m_font.CreatePointFont(100, _T("Segoe UI"));
-	}
-	GetEditCtrl().SetFont(&m_font);
-}
-
-// Helper to convert UTF-8 string to MFC CString
-static CString Utf8ToCString(const std::string& utf8_str)
-{
-	if (utf8_str.empty()) return _T("");
-	int len = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), (int)utf8_str.length(), NULL, 0);
-	std::wstring wstr(len, 0);
-	MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), (int)utf8_str.length(), &wstr[0], len);
-	return CString(wstr.c_str());
+	CHtmlView::OnInitialUpdate();
+	Navigate(_T("about:blank"));
 }
 
 void CArticleView::SetArticle(const media::rss::feed_item& item)
 {
-	CString text;
+	// Get temporary folder path for HTML preview file
+	wchar_t temp_path[MAX_PATH];
+	if (GetTempPathW(MAX_PATH, temp_path) == 0)
+	{
+		return;
+	}
+	std::wstring html_file = std::wstring(temp_path) + L"mfc_news_article.html";
 
-	text += _T("Title: ") + Utf8ToCString(item.title) + _T("\r\n");
+	// Generate a modern, highly styled HTML document
+	std::string html;
+	html += "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n";
+	html += "<style>\n";
+	html += "  body {\n";
+	html += "    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n";
+	html += "    color: #2c3e50;\n";
+	html += "    background-color: #f8f9fa;\n";
+	html += "    line-height: 1.6;\n";
+	html += "    margin: 0;\n";
+	html += "    padding: 20px;\n";
+	html += "  }\n";
+	html += "  .article-card {\n";
+	html += "    background: #ffffff;\n";
+	html += "    padding: 30px;\n";
+	html += "    border-radius: 12px;\n";
+	html += "    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);\n";
+	html += "    max-width: 750px;\n";
+	html += "    margin: 0 auto;\n";
+	html += "    border: 1px solid #e9ecef;\n";
+	html += "  }\n";
+	html += "  h1 {\n";
+	html += "    font-size: 26px;\n";
+	html += "    color: #1a1a1a;\n";
+	html += "    margin-top: 0;\n";
+	html += "    margin-bottom: 15px;\n";
+	html += "    font-weight: 700;\n";
+	html += "    line-height: 1.3;\n";
+	html += "  }\n";
+	html += "  .meta {\n";
+	html += "    font-size: 13px;\n";
+	html += "    color: #6c757d;\n";
+	html += "    margin-bottom: 25px;\n";
+	html += "    border-bottom: 1px solid #dee2e6;\n";
+	html += "    padding-bottom: 15px;\n";
+	html += "  }\n";
+	html += "  .meta a {\n";
+	html += "    color: #007bff;\n";
+	html += "    text-decoration: none;\n";
+	html += "    font-weight: 500;\n";
+	html += "  }\n";
+	html += "  .meta a:hover {\n";
+	html += "    text-decoration: underline;\n";
+	html += "  }\n";
+	html += "  .image-container {\n";
+	html += "    margin-bottom: 25px;\n";
+	html += "    text-align: center;\n";
+	html += "  }\n";
+	html += "  .article-image {\n";
+	html += "    max-width: 100%;\n";
+	html += "    height: auto;\n";
+	html += "    border-radius: 8px;\n";
+	html += "    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);\n";
+	html += "  }\n";
+	html += "  .content {\n";
+	html += "    font-size: 16px;\n";
+	html += "    color: #333333;\n";
+	html += "  }\n";
+	html += "  .media-badge {\n";
+	html += "    display: inline-block;\n";
+	html += "    background: #e7f5ff;\n";
+	html += "    color: #007bff;\n";
+	html += "    padding: 6px 12px;\n";
+	html += "    border-radius: 20px;\n";
+	html += "    font-size: 12px;\n";
+	html += "    font-weight: 600;\n";
+	html += "    margin-bottom: 15px;\n";
+	html += "  }\n";
+	html += "</style>\n</head>\n<body>\n";
+	html += "<div class=\"article-card\">\n";
+
+	if (item.has_media())
+	{
+		html += "  <div class=\"media-badge\">🎬 Playable Media Available</div>\n";
+	}
+
+	html += "  <h1>" + item.title + "</h1>\n";
 
 	std::time_t t = std::chrono::system_clock::to_time_t(item.updated);
-	std::tm tm;
-	localtime_s(&tm, &t);
+	std::tm tm_info;
+	localtime_s(&tm_info, &t);
 	wchar_t date_buf[64];
-	wcsftime(date_buf, 64, L"%Y-%m-%d %H:%M:%S", &tm);
-	text += _T("Date: ") + CString(date_buf) + _T("\r\n");
+	wcsftime(date_buf, 64, L"%Y-%m-%d %H:%M:%S", &tm_info);
+	std::wstring wdate(date_buf);
+	std::string date_str(wdate.begin(), wdate.end());
 
-	text += _T("Link: ") + Utf8ToCString(item.link) + _T("\r\n");
+	html += "  <div class=\"meta\">\n";
+	html += "    Published: " + date_str + " | <a href=\"" + item.link + "\" target=\"_blank\">Open in Browser</a>\n";
+	html += "  </div>\n";
 
 	if (!item.image_url.empty())
 	{
-		text += _T("Image URL: ") + Utf8ToCString(item.image_url) + _T("\r\n");
+		html += "  <div class=\"image-container\">\n";
+		html += "    <img class=\"article-image\" src=\"" + item.image_url + "\" />\n";
+		html += "  </div>\n";
 	}
 
-	text += _T("Has Playable Media: ") + CString(item.has_media() ? _T("Yes") : _T("No")) + _T("\r\n");
-	if (item.has_media())
+	html += "  <div class=\"content\">\n";
+	html += "    " + item.description + "\n";
+	html += "  </div>\n";
+	html += "</div>\n</body>\n</html>\n";
+
+	// Write UTF-8 HTML file
+	FILE* f = nullptr;
+	_wfopen_s(&f, html_file.c_str(), L"wb");
+	if (f)
 	{
-		text += _T("Best Media URL: ") + Utf8ToCString(item.get_best_media_url()) + _T("\r\n");
+		fwrite(html.c_str(), 1, html.length(), f);
+		fclose(f);
 	}
 
-	text += _T("Extracted Media Count: ") + CString(std::to_wstring(item.extracted_media_urls.size()).c_str()) + _T("\r\n");
-	for (size_t i = 0; i < item.extracted_media_urls.size(); ++i)
-	{
-		text += _T("  - [") + Utf8ToCString(item.extracted_media_urls[i].type) + _T("/") + 
-		        Utf8ToCString(item.extracted_media_urls[i].format) + _T("] ") + 
-		        Utf8ToCString(item.extracted_media_urls[i].url) + _T("\r\n");
-	}
-
-	text += _T("\r\n----------------------------------------------------------------------\r\n\r\n");
-
-	text += Utf8ToCString(item.description) + _T("\r\n");
-
-	GetEditCtrl().SetWindowText(text);
+	// Navigate to preview file
+	Navigate(html_file.c_str());
 }
 
 #ifdef _DEBUG
 void CArticleView::AssertValid() const
 {
-	CEditView::AssertValid();
+	CHtmlView::AssertValid();
 }
 
 void CArticleView::Dump(CDumpContext& dc) const
 {
-	CEditView::Dump(dc);
+	CHtmlView::Dump(dc);
 }
 #endif //_DEBUG

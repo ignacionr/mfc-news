@@ -1,8 +1,9 @@
 #pragma once
 
+#include <afxhtml.h>
 #include "rss/feed_item.hpp"
 
-class CArticleView : public CEditView
+class CArticleView : public CHtmlView
 {
 protected:
 	CArticleView() noexcept;
@@ -23,6 +24,5 @@ public:
 #endif
 
 protected:
-	CFont m_font;
 	DECLARE_MESSAGE_MAP()
 };
