@@ -5,8 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Enable MFC (2 = Shared DLL, 1 = Static Library)
-set(CMAKE_MFC_FLAG 2)
+# Enable MFC (1 = Static Library, 2 = Shared DLL)
+set(CMAKE_MFC_FLAG 1)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 # Find TinyXML2
 find_package(tinyxml2 CONFIG REQUIRED)
@@ -42,7 +43,6 @@ add_executable(MfcNews WIN32 ${SRC_FILES})
 target_compile_definitions(MfcNews PRIVATE
     UNICODE
     _UNICODE
-    _AFXDLL
 )
 
 # Include directories
