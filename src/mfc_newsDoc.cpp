@@ -48,10 +48,10 @@ void CMfcNewsDoc::AddFeed(const CString& title, const CString& url)
 std::string CMfcNewsDoc::DownloadFeedUrl(const CString& url)
 {
 	std::string utf8_content;
-	CInternetSession session(_T("MfcNewsReader"));
 	CHttpFile* pFile = nullptr;
 	try
 	{
+		CInternetSession session(_T("MfcNewsReader"));
 		pFile = (CHttpFile*)session.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_RELOAD | INTERNET_FLAG_DONT_CACHE);
 		if (pFile)
 		{
@@ -61,20 +61,28 @@ std::string CMfcNewsDoc::DownloadFeedUrl(const CString& url)
 			{
 				utf8_content.append(buffer, bytesRead);
 			}
+			pFile->Close();
+			delete pFile;
+			pFile = nullptr;
+		}
+		session.Close();
+	}
+	catch (CException* pEx)
+	{
+		pEx->Delete();
+		if (pFile)
+		{
+			try { pFile->Close(); } catch(...) {}
+			delete pFile;
 		}
 	}
-	catch (CInternetException* pEx)
+	catch (...)
 	{
-		// Silently catch network errors for offline durability
-		pEx->Delete();
+		if (pFile)
+		{
+			delete pFile;
+		}
 	}
-	
-	if (pFile)
-	{
-		pFile->Close();
-		delete pFile;
-	}
-	session.Close();
 	return utf8_content;
 }
 
