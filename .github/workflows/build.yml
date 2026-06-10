@@ -27,4 +27,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: MfcNews-binary
-        path: build/**/*.exe
+        path: |
+          build/**/*.exe
+          build/**/*.map

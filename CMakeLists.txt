@@ -54,4 +54,5 @@ target_link_libraries(MfcNews PRIVATE tinyxml2::tinyxml2)
 # Enable precompiled headers if on MSVC for faster builds
 if(MSVC)
     target_compile_options(MfcNews PRIVATE /W4)
+    target_link_options(MfcNews PRIVATE /MAP)
 endif()
