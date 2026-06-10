@@ -1,0 +1,125 @@
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+#include "winres.h"
+#undef APSTUDIO_READONLY_SYMBOLS
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+// Dialogs
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About MfcNews"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "MfcNews RSS Reader, Version 1.0",IDC_STATIC,35,14,120,8,SS_NOPREFIX
+    LTEXT           "Using Rouen RSS Logic",IDC_STATIC,35,26,120,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_ADD_FEED DIALOGEX 0, 0, 250, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add RSS Feed"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Feed Title:",IDC_STATIC,10,15,40,8
+    EDITTEXT        IDC_FEED_TITLE,55,12,185,14,ES_AUTOHSCROLL
+    LTEXT           "Feed URL:",IDC_STATIC,10,35,40,8
+    EDITTEXT        IDC_FEED_URL,55,32,185,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,135,55,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,190,55,50,14
+END
+
+// Menus
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&Feed"
+    BEGIN
+        MENUITEM "&Add Feed...",                ID_FEED_ADD
+        MENUITEM "&Refresh\tF5",                ID_FEED_REFRESH
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About MfcNews...",           ID_APP_ABOUT
+    END
+END
+
+// Accelerators
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_F5,          ID_FEED_REFRESH,        VIRTKEY
+END
+
+// Version Info
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "Ignacio Rodriguez"
+            VALUE "FileDescription", "MFC Single Document RSS Reader"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "MfcNews.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2026"
+            VALUE "OriginalFilename", "MfcNews.exe"
+            VALUE "ProductName", "MfcNews"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+// String Tables
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "MfcNews\n\nMfcNews\nMfcNews Files (*.news)\n.news\nMfcNews.Document\nMfcNews.Document"
+    AFX_IDS_APP_TITLE       "MfcNews RSS Reader"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+#endif

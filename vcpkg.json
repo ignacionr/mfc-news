@@ -1,0 +1,8 @@
+{
+  "name": "mfc-news",
+  "version": "1.0.0",
+  "description": "MFC Single Document RSS Reader using Rouen RSS logic",
+  "dependencies": [
+    "tinyxml2"
+  ]
+}

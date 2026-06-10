@@ -1,0 +1,22 @@
+# CMake build directories
+/build/
+/out/
+
+# vcpkg
+/vcpkg_installed/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.db
+*.opendb
+
+# MSVC compiler output
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.dll
+*.log
