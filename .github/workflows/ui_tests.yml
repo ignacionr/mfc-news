@@ -27,8 +27,12 @@ jobs:
       run: |
         .\scripts\automate_ui.ps1
 
-    - name: Upload UI Screenshots
+    - name: Upload UI Screenshots and Logs
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: ui-snapshots
-        path: screenshots/*.png
+        path: |
+          screenshots/*.png
+          mfcnews_debug.log
+          build/**/*.map

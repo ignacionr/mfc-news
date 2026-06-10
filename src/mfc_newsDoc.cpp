@@ -4,6 +4,7 @@
 #include "rss/feed.hpp"
 #include <propkey.h>
 #include <algorithm>
+#include <fstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,16 +25,24 @@ CMfcNewsDoc::~CMfcNewsDoc()
 
 BOOL CMfcNewsDoc::OnNewDocument()
 {
+	std::ofstream log("mfcnews_debug.log", std::ios::app);
+	log << "[DEBUG] OnNewDocument start" << std::endl;
+
 	if (!CDocument::OnNewDocument())
+	{
+		log << "[DEBUG] CDocument::OnNewDocument failed" << std::endl;
 		return FALSE;
+	}
 
 	// Populate with some premium default RSS feeds so the user is wowed immediately
 	m_feeds.clear();
 	m_feeds.emplace_back(_T("BBC News"), _T("http://feeds.bbci.co.uk/news/rss.xml"));
 	m_feeds.emplace_back(_T("NASA Breaking News"), _T("https://www.nasa.gov/news-release/feed/"));
 	
+	log << "[DEBUG] RefreshAllFeeds start" << std::endl;
 	// Refresh automatically on startup
 	RefreshAllFeeds();
+	log << "[DEBUG] RefreshAllFeeds end" << std::endl;
 
 	return TRUE;
 }
