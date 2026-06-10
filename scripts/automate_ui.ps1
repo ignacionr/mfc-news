@@ -67,6 +67,9 @@ Write-Output "Closing application..."
 try {
     if ($process -and !$process.HasExited) {
         $process.CloseMainWindow() | Out-Null
+        Start-Sleep -Seconds 1
+        # Dismiss standard MFC "Save changes" prompt if it appears by sending 'n' (No / Don't Save)
+        [System.Windows.Forms.SendKeys]::SendWait("n")
         Start-Sleep -Seconds 2
     }
 } catch {
