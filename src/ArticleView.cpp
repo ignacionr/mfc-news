@@ -15,19 +15,26 @@ END_MESSAGE_MAP()
 
 CArticleView::CArticleView() noexcept
 {
+	WriteDebugLog("[DEBUG] CArticleView constructor");
 }
 
 CArticleView::~CArticleView()
 {
+	WriteDebugLog("[DEBUG] CArticleView destructor");
 }
 
 BOOL CArticleView::PreCreateWindow(CREATESTRUCT& cs)
 {
+	WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow start");
 	if (!CEditView::PreCreateWindow(cs))
+	{
+		WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow failed");
 		return FALSE;
+	}
 
 	// Multi-line, read-only edit control with scrolling
 	cs.style |= ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL;
+	WriteDebugLog("[DEBUG] CArticleView::PreCreateWindow succeeded");
 	return TRUE;
 }
 

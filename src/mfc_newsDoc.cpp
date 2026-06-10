@@ -17,20 +17,21 @@ END_MESSAGE_MAP()
 
 CMfcNewsDoc::CMfcNewsDoc() noexcept
 {
+	WriteDebugLog("[DEBUG] CMfcNewsDoc constructor");
 }
 
 CMfcNewsDoc::~CMfcNewsDoc()
 {
+	WriteDebugLog("[DEBUG] CMfcNewsDoc destructor");
 }
 
 BOOL CMfcNewsDoc::OnNewDocument()
 {
-	std::ofstream log("mfcnews_debug.log", std::ios::app);
-	log << "[DEBUG] OnNewDocument start" << std::endl;
+	WriteDebugLog("[DEBUG] OnNewDocument start");
 
 	if (!CDocument::OnNewDocument())
 	{
-		log << "[DEBUG] CDocument::OnNewDocument failed" << std::endl;
+		WriteDebugLog("[DEBUG] CDocument::OnNewDocument failed");
 		return FALSE;
 	}
 
@@ -39,10 +40,10 @@ BOOL CMfcNewsDoc::OnNewDocument()
 	m_feeds.emplace_back(_T("BBC News"), _T("http://feeds.bbci.co.uk/news/rss.xml"));
 	m_feeds.emplace_back(_T("NASA Breaking News"), _T("https://www.nasa.gov/news-release/feed/"));
 	
-	log << "[DEBUG] RefreshAllFeeds start" << std::endl;
+	WriteDebugLog("[DEBUG] RefreshAllFeeds start");
 	// Refresh automatically on startup
 	RefreshAllFeeds();
-	log << "[DEBUG] RefreshAllFeeds end" << std::endl;
+	WriteDebugLog("[DEBUG] RefreshAllFeeds end");
 
 	return TRUE;
 }

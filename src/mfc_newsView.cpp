@@ -37,23 +37,31 @@ END_MESSAGE_MAP()
 
 CMfcNewsView::CMfcNewsView() noexcept
 {
+	WriteDebugLog("[DEBUG] CMfcNewsView constructor");
 }
 
 CMfcNewsView::~CMfcNewsView()
 {
+	WriteDebugLog("[DEBUG] CMfcNewsView destructor");
 }
 
 BOOL CMfcNewsView::PreCreateWindow(CREATESTRUCT& cs)
 {
+	WriteDebugLog("[DEBUG] CMfcNewsView::PreCreateWindow start");
 	if (!CListView::PreCreateWindow(cs))
+	{
+		WriteDebugLog("[DEBUG] CMfcNewsView::PreCreateWindow failed");
 		return FALSE;
+	}
 
 	cs.style |= LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS;
+	WriteDebugLog("[DEBUG] CMfcNewsView::PreCreateWindow succeeded");
 	return TRUE;
 }
 
 void CMfcNewsView::OnInitialUpdate()
 {
+	WriteDebugLog("[DEBUG] CMfcNewsView::OnInitialUpdate start");
 	CListView::OnInitialUpdate();
 
 	CListCtrl& listCtrl = GetListCtrl();
@@ -62,7 +70,9 @@ void CMfcNewsView::OnInitialUpdate()
 	listCtrl.InsertColumn(0, _T("Title"), LVCFMT_LEFT, 240);
 	listCtrl.InsertColumn(1, _T("Date"), LVCFMT_LEFT, 110);
 
+	WriteDebugLog("[DEBUG] CMfcNewsView::OnInitialUpdate calling OnUpdate");
 	OnUpdate(NULL, 0, NULL);
+	WriteDebugLog("[DEBUG] CMfcNewsView::OnInitialUpdate complete");
 }
 
 // Helper to convert UTF-8 string to MFC CString
@@ -77,14 +87,22 @@ static CString Utf8ToCString(const std::string& utf8_str)
 
 void CMfcNewsView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
+	WriteDebugLog("[DEBUG] CMfcNewsView::OnUpdate start");
 	CListCtrl& listCtrl = GetListCtrl();
 	if (!listCtrl.GetSafeHwnd())
+	{
+		WriteDebugLog("[DEBUG] CMfcNewsView::OnUpdate - GetSafeHwnd returned NULL");
 		return;
+	}
 
 	listCtrl.DeleteAllItems();
 
 	CMfcNewsDoc* pDoc = GetDocument();
-	if (!pDoc) return;
+	if (!pDoc) 
+	{
+		WriteDebugLog("[DEBUG] CMfcNewsView::OnUpdate - GetDocument returned NULL");
+		return;
+	}
 
 	const auto& items = pDoc->GetItems();
 	for (size_t i = 0; i < items.size(); ++i)
@@ -101,6 +119,7 @@ void CMfcNewsView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHi
 
 		listCtrl.SetItemData(index, i);
 	}
+	WriteDebugLog("[DEBUG] CMfcNewsView::OnUpdate end");
 }
 
 void CMfcNewsView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)

@@ -19,10 +19,9 @@ END_MESSAGE_MAP()
 // CMfcNewsApp construction
 CMfcNewsApp::CMfcNewsApp() noexcept
 {
-	std::ofstream log("mfcnews_debug.log", std::ios::app);
-	log << "[DEBUG] CMfcNewsApp constructor start" << std::endl;
+	WriteDebugLog("[DEBUG] CMfcNewsApp constructor start");
 	SetAppID(_T("MfcNews.AppID.NoVersion"));
-	log << "[DEBUG] CMfcNewsApp constructor end" << std::endl;
+	WriteDebugLog("[DEBUG] CMfcNewsApp constructor end");
 }
 
 // The one and only CMfcNewsApp object
@@ -31,8 +30,7 @@ CMfcNewsApp theApp;
 // CMfcNewsApp initialization
 BOOL CMfcNewsApp::InitInstance()
 {
-	std::ofstream log("mfcnews_debug.log", std::ios::app);
-	log << "[DEBUG] InitInstance start" << std::endl;
+	WriteDebugLog("[DEBUG] InitInstance start");
 
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
@@ -40,15 +38,15 @@ BOOL CMfcNewsApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
-	log << "[DEBUG] CWinApp::InitInstance completed" << std::endl;
+	WriteDebugLog("[DEBUG] CWinApp::InitInstance completed");
 
 	if (!AfxOleInit())
 	{
-		log << "[DEBUG] AfxOleInit failed" << std::endl;
+		WriteDebugLog("[DEBUG] AfxOleInit failed");
 		AfxMessageBox(_T("OLE initialization failed!"));
 		return FALSE;
 	}
-	log << "[DEBUG] AfxOleInit succeeded" << std::endl;
+	WriteDebugLog("[DEBUG] AfxOleInit succeeded");
 
 	AfxEnableControlContainer();
 
@@ -65,24 +63,27 @@ BOOL CMfcNewsApp::InitInstance()
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	log << "[DEBUG] ProcessShellCommand start" << std::endl;
+	WriteDebugLog("[DEBUG] ProcessShellCommand start");
 	if (!ProcessShellCommand(cmdInfo))
 	{
-		log << "[DEBUG] ProcessShellCommand failed" << std::endl;
+		WriteDebugLog("[DEBUG] ProcessShellCommand failed");
 		return FALSE;
 	}
-	log << "[DEBUG] ProcessShellCommand succeeded" << std::endl;
+	WriteDebugLog("[DEBUG] ProcessShellCommand succeeded");
 
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
-	log << "[DEBUG] InitInstance end (success)" << std::endl;
+	WriteDebugLog("[DEBUG] InitInstance end (success)");
 	return TRUE;
 }
 
 int CMfcNewsApp::ExitInstance()
 {
+	WriteDebugLog("[DEBUG] ExitInstance start");
 	AfxOleTerm(FALSE);
-	return CWinApp::ExitInstance();
+	int ret = CWinApp::ExitInstance();
+	WriteDebugLog("[DEBUG] ExitInstance end");
+	return ret;
 }
 
 class CAboutDlg : public CDialogEx
