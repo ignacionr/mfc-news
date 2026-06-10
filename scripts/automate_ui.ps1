@@ -64,10 +64,26 @@ Take-Screenshot "4_new_feed_merged.png"
 
 # 6. Close the application gracefully
 Write-Output "Closing application..."
-$process.CloseMainWindow() | Out-Null
-Start-Sleep -Seconds 2
+try {
+    if ($process -and !$process.HasExited) {
+        $process.CloseMainWindow() | Out-Null
+        Start-Sleep -Seconds 2
+    }
+} catch {
+    Write-Output "Failed to close main window: $_"
+}
 
 # Force terminate if still running
-Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+if ($process -and !$process.HasExited) {
+    Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+}
+
+# Wait for process to clean up and get exit code
+Start-Sleep -Seconds 1
+if ($process -and $process.HasExited) {
+    Write-Output "MfcNews.exe exited with code: $($process.ExitCode)"
+} elseif ($process) {
+    Write-Output "MfcNews.exe is still running."
+}
 
 Write-Output "Automation script finished."
