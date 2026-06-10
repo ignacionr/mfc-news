@@ -13,6 +13,7 @@ public:
 
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual void OnInitialUpdate();
 
 public:
 	virtual ~CArticleView();
@@ -22,5 +23,6 @@ public:
 #endif
 
 protected:
+	CFont m_font;
 	DECLARE_MESSAGE_MAP()
 };

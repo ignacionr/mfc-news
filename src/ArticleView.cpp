@@ -38,6 +38,18 @@ BOOL CArticleView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+void CArticleView::OnInitialUpdate()
+{
+	CEditView::OnInitialUpdate();
+
+	// Create and set a premium, highly readable modern font (Segoe UI, 10pt)
+	if (m_font.GetSafeHandle() == NULL)
+	{
+		m_font.CreatePointFont(100, _T("Segoe UI"));
+	}
+	GetEditCtrl().SetFont(&m_font);
+}
+
 // Helper to convert UTF-8 string to MFC CString
 static CString Utf8ToCString(const std::string& utf8_str)
 {
@@ -62,6 +74,11 @@ void CArticleView::SetArticle(const media::rss::feed_item& item)
 	text += _T("Date: ") + CString(date_buf) + _T("\r\n");
 
 	text += _T("Link: ") + Utf8ToCString(item.link) + _T("\r\n");
+
+	if (!item.image_url.empty())
+	{
+		text += _T("Image URL: ") + Utf8ToCString(item.image_url) + _T("\r\n");
+	}
 
 	text += _T("Has Playable Media: ") + CString(item.has_media() ? _T("Yes") : _T("No")) + _T("\r\n");
 	if (item.has_media())
