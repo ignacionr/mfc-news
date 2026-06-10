@@ -38,12 +38,17 @@
 #include <afxcview.h>           // MFC common control views (like CListView)
 #include <afxinet.h>           // MFC WinINet classes (for fetching RSS feeds)
 
-#include <fstream>
 #include <string>
 
 inline void WriteDebugLog(const std::string& msg)
 {
-	std::ofstream log("mfcnews_debug.log", std::ios::app);
-	log << msg << std::endl;
+	HANDLE hFile = ::CreateFileA("mfcnews_debug.log", FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		std::string formatted = msg + "\r\n";
+		DWORD written = 0;
+		::WriteFile(hFile, formatted.c_str(), (DWORD)formatted.length(), &written, NULL);
+		::CloseHandle(hFile);
+	}
 }
 

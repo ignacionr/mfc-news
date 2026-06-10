@@ -4,7 +4,6 @@
 #include "rss/feed.hpp"
 #include <propkey.h>
 #include <algorithm>
-#include <fstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

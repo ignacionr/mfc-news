@@ -3,7 +3,6 @@
 #include "MainFrm.h"
 #include "mfc_newsView.h"
 #include "ArticleView.h"
-#include <fstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
