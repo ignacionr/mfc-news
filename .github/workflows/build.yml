@@ -22,3 +22,9 @@ jobs:
     - name: Build MfcNews executable
       run: |
         cmake --build build --config Release
+
+    - name: Upload MfcNews binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: MfcNews-binary
+        path: build/**/*.exe
