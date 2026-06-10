@@ -29,69 +29,73 @@ namespace media::html {
     
     inline std::vector<extracted_media> extract_media_urls(std::string_view html_content) {
         std::vector<extracted_media> results;
-        std::string content_str(html_content);
-        
-        std::vector<std::pair<std::regex, std::string>> patterns = {
-            {std::regex(R"(<iframe[^>]+src\s*=\s*[\"']([^\"']*\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv)[^\"']*)[\"'][^>]*>)", 
-                       std::regex_constants::icase), "video"},
-            {std::regex(R"(<video[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*>)", 
-                       std::regex_constants::icase), "video"},
-            {std::regex(R"(<source[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*type\s*=\s*[\"']video/[^\"']*[\"'][^>]*>)", 
-                       std::regex_constants::icase), "video"},
-            {std::regex(R"(<audio[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*>)", 
-                       std::regex_constants::icase), "audio"},
-            {std::regex(R"(<source[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*type\s*=\s*[\"']audio/[^\"']*[\"'][^>]*>)", 
-                       std::regex_constants::icase), "audio"},
-            {std::regex(R"((?:youtube\.com/embed/|youtu\.be/)([a-zA-Z0-9_-]+))", 
-                       std::regex_constants::icase), "video"},
-            {std::regex(R"(vimeo\.com/(?:video/)?(\d+))", 
-                       std::regex_constants::icase), "video"},
-            {std::regex(R"((https?://[^\s<>"']+\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv|mp3|wav|ogg|aac|m4a|wma)(?:\?[^\s<>"']*)?))", 
-                       std::regex_constants::icase), "unknown"}
-        };
-        
-        for (const auto& [pattern, media_type] : patterns) {
-            std::sregex_iterator iter(content_str.begin(), content_str.end(), pattern);
-            std::sregex_iterator end;
+        try {
+            std::string content_str(html_content);
             
-            for (; iter != end; ++iter) {
-                std::string url = iter->str(1);
+            std::vector<std::pair<std::regex, std::string>> patterns = {
+                {std::regex(R"(<iframe[^>]+src\s*=\s*[\"']([^\"']*\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv)[^\"']*)[\"'][^>]*>)", 
+                           std::regex_constants::icase), "video"},
+                {std::regex(R"(<video[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*>)", 
+                           std::regex_constants::icase), "video"},
+                {std::regex(R"(<source[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*type\s*=\s*[\"']video/[^\"']*[\"'][^>]*>)", 
+                           std::regex_constants::icase), "video"},
+                {std::regex(R"(<audio[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*>)", 
+                           std::regex_constants::icase), "audio"},
+                {std::regex(R"(<source[^>]+src\s*=\s*[\"']([^\"']+)[\"'][^>]*type\s*=\s*[\"']audio/[^\"']*[\"'][^>]*>)", 
+                           std::regex_constants::icase), "audio"},
+                {std::regex(R"((?:youtube\.com/embed/|youtu\.be/)([a-zA-Z0-9_-]+))", 
+                           std::regex_constants::icase), "video"},
+                {std::regex(R"(vimeo\.com/(?:video/)?(\d+))", 
+                           std::regex_constants::icase), "video"},
+                {std::regex(R"((https?://[^\s<>"']+\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv|mp3|wav|ogg|aac|m4a|wma)(?:\?[^\s<>"']*)?))", 
+                           std::regex_constants::icase), "unknown"}
+            };
+            
+            for (const auto& [pattern, media_type] : patterns) {
+                std::sregex_iterator iter(content_str.begin(), content_str.end(), pattern);
+                std::sregex_iterator end;
                 
-                if (media_type == "video" && url.find("youtube") != std::string::npos) {
-                    if (url.find("/embed/") != std::string::npos || url.find("youtu.be/") != std::string::npos) {
-                        std::regex yt_id_regex(R"((?:embed/|youtu\.be/)([a-zA-Z0-9_-]+))");
-                        std::smatch match;
-                        if (std::regex_search(url, match, yt_id_regex)) {
-                            url = "https://www.youtube.com/watch?v=" + match[1].str();
+                for (; iter != end; ++iter) {
+                    std::string url = iter->str(1);
+                    
+                    if (media_type == "video" && url.find("youtube") != std::string::npos) {
+                        if (url.find("/embed/") != std::string::npos || url.find("youtu.be/") != std::string::npos) {
+                            std::regex yt_id_regex(R"((?:embed/|youtu\.be/)([a-zA-Z0-9_-]+))");
+                            std::smatch match;
+                            if (std::regex_search(url, match, yt_id_regex)) {
+                                url = "https://www.youtube.com/watch?v=" + match[1].str();
+                            }
                         }
                     }
-                }
-                
-                if (media_type == "video" && url.find("vimeo") != std::string::npos) {
-                    std::regex vimeo_id_regex(R"(vimeo\.com/(?:video/)?(\d+))");
-                    std::smatch match;
-                    if (std::regex_search(url, match, vimeo_id_regex)) {
-                        url = "https://vimeo.com/" + match[1].str();
+                    
+                    if (media_type == "video" && url.find("vimeo") != std::string::npos) {
+                        std::regex vimeo_id_regex(R"(vimeo\.com/(?:video/)?(\d+))");
+                        std::smatch match;
+                        if (std::regex_search(url, match, vimeo_id_regex)) {
+                            url = "https://vimeo.com/" + match[1].str();
+                        }
                     }
-                }
-                
-                url = normalize_media_url(url);
-                std::string format = extract_format(url);
-                
-                bool duplicate = false;
-                for (const auto& existing : results) {
-                    if (existing.url == url) {
-                        duplicate = true;
-                        break;
+                    
+                    url = normalize_media_url(url);
+                    std::string format = extract_format(url);
+                    
+                    bool duplicate = false;
+                    for (const auto& existing : results) {
+                        if (existing.url == url) {
+                            duplicate = true;
+                            break;
+                        }
                     }
-                }
-                
-                if (!duplicate && !url.empty()) {
-                    results.emplace_back(url, media_type, format);
+                    
+                    if (!duplicate && !url.empty()) {
+                        results.emplace_back(url, media_type, format);
+                    }
                 }
             }
         }
-        
+        catch (...) {
+            // Gracefully ignore complexity/stack errors from std::regex on long HTML content
+        }
         return results;
     }
     

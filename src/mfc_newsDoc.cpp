@@ -98,25 +98,55 @@ std::string CMfcNewsDoc::DownloadFeedUrl(const CString& url)
 
 void CMfcNewsDoc::RefreshAllFeeds()
 {
-	m_items.clear();
-	
-	for (const auto& feed_info : m_feeds)
+	try
 	{
-		std::string xml = DownloadFeedUrl(feed_info.second);
-		if (!xml.empty())
+		m_items.clear();
+		
+		for (const auto& feed_info : m_feeds)
 		{
-			media::rss::feed parser;
-			parser(xml);
-			m_items.insert(m_items.end(), parser.items.begin(), parser.items.end());
+			try
+			{
+				std::string xml = DownloadFeedUrl(feed_info.second);
+				if (!xml.empty())
+				{
+					media::rss::feed parser;
+					parser(xml);
+					m_items.insert(m_items.end(), parser.items.begin(), parser.items.end());
+				}
+			}
+			catch (const std::exception&)
+			{
+				// Ignore parsing errors for this feed
+			}
+			catch (...)
+			{
+				// Ignore other exceptions
+			}
+		}
+
+		// Sort articles: newest first
+		try
+		{
+			std::sort(m_items.begin(), m_items.end(), [](const media::rss::feed_item& a, const media::rss::feed_item& b) {
+				return a.updated > b.updated;
+			});
+		}
+		catch (...)
+		{
+		}
+
+		try
+		{
+			UpdateAllViews(NULL);
+		}
+		catch (...)
+		{
 		}
 	}
-
-	// Sort articles: newest first
-	std::sort(m_items.begin(), m_items.end(), [](const media::rss::feed_item& a, const media::rss::feed_item& b) {
-		return a.updated > b.updated;
-	});
-
-	UpdateAllViews(NULL);
+	catch (...)
+	{
+		// Prevent any other exception from cascading
+	}
 }
 
 void CMfcNewsDoc::Serialize(CArchive& ar)
