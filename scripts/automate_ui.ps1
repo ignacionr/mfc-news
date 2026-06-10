@@ -81,9 +81,15 @@ if ($process -and !$process.HasExited) {
 # Wait for process to clean up and get exit code
 Start-Sleep -Seconds 1
 if ($process -and $process.HasExited) {
-    Write-Output "MfcNews.exe exited with code: $($process.ExitCode)"
+    $exitCode = $process.ExitCode
+    Write-Output "MfcNews.exe exited with code: $exitCode"
+    if ($exitCode -ne 0) {
+        Write-Error "MfcNews.exe exited with a non-zero code: $exitCode"
+        exit $exitCode
+    }
 } elseif ($process) {
-    Write-Output "MfcNews.exe is still running."
+    Write-Error "MfcNews.exe failed to exit."
+    exit 1
 }
 
 Write-Output "Automation script finished."
