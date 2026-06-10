@@ -46,7 +46,7 @@ namespace media::html {
                        std::regex_constants::icase), "video"},
             {std::regex(R"(vimeo\.com/(?:video/)?(\d+))", 
                        std::regex_constants::icase), "video"},
-            {std::regex(R"(https?://[^\s<>"']+\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv|mp3|wav|ogg|aac|m4a|wma)(?:\?[^\s<>"']*)?)", 
+            {std::regex(R"((https?://[^\s<>"']+\.(?:mp4|webm|avi|mov|mkv|m4v|3gp|flv|mp3|wav|ogg|aac|m4a|wma)(?:\?[^\s<>"']*)?))", 
                        std::regex_constants::icase), "unknown"}
         };
         

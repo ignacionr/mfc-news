@@ -48,40 +48,50 @@ void CMfcNewsDoc::AddFeed(const CString& title, const CString& url)
 std::string CMfcNewsDoc::DownloadFeedUrl(const CString& url)
 {
 	std::string utf8_content;
-	CHttpFile* pFile = nullptr;
 	try
 	{
 		CInternetSession session(_T("MfcNewsReader"));
-		pFile = (CHttpFile*)session.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_RELOAD | INTERNET_FLAG_DONT_CACHE);
-		if (pFile)
+		CHttpFile* pFile = nullptr;
+		try
 		{
-			char buffer[4096];
-			UINT bytesRead = 0;
-			while ((bytesRead = pFile->Read(buffer, sizeof(buffer))) > 0)
+			pFile = (CHttpFile*)session.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_RELOAD | INTERNET_FLAG_DONT_CACHE);
+			if (pFile)
 			{
-				utf8_content.append(buffer, bytesRead);
+				char buffer[4096];
+				UINT bytesRead = 0;
+				while ((bytesRead = pFile->Read(buffer, sizeof(buffer))) > 0)
+				{
+					utf8_content.append(buffer, bytesRead);
+				}
+				pFile->Close();
+				delete pFile;
+				pFile = nullptr;
 			}
-			pFile->Close();
-			delete pFile;
-			pFile = nullptr;
+		}
+		catch (CException* pEx)
+		{
+			pEx->Delete();
+			if (pFile)
+			{
+				try { pFile->Close(); } catch(...) {}
+				delete pFile;
+			}
+		}
+		catch (...)
+		{
+			if (pFile)
+			{
+				delete pFile;
+			}
 		}
 		session.Close();
 	}
 	catch (CException* pEx)
 	{
 		pEx->Delete();
-		if (pFile)
-		{
-			try { pFile->Close(); } catch(...) {}
-			delete pFile;
-		}
 	}
 	catch (...)
 	{
-		if (pFile)
-		{
-			delete pFile;
-		}
 	}
 	return utf8_content;
 }
