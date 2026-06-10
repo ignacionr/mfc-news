@@ -123,4 +123,8 @@ BEGIN
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
+#ifndef APSTUDIO_INVOKED
+#include "afxres.rc"
+#endif
+
 #endif
