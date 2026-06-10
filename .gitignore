@@ -20,3 +20,6 @@
 *.lib
 *.dll
 *.log
+
+Release
+
