@@ -75,6 +75,7 @@ BEGIN
     "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
     "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    "A",            ID_FEED_ADD,            VIRTKEY, CONTROL
     VK_F5,          ID_FEED_REFRESH,        VIRTKEY
 END
 

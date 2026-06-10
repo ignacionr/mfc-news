@@ -1,0 +1,34 @@
+name: UI Tests and Snapshots
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  ui-test:
+    name: Run UI Automation
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure CMake with vcpkg
+      run: |
+        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+
+    - name: Build MfcNews executable
+      run: |
+        cmake --build build --config Release
+
+    - name: Run UI Automation Script
+      shell: powershell
+      run: |
+        .\scripts\automate_ui.ps1
+
+    - name: Upload UI Screenshots
+      uses: actions/upload-artifact@v4
+      with:
+        name: ui-snapshots
+        path: screenshots/*.png
