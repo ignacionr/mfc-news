@@ -1,7 +1,6 @@
 # MfcNews RSS Reader
 
-[![Build MFC RSS Reader](https://github.com/ignacionr/mfc-news/actions/workflows/build.yml/badge.svg)](https://github.com/ignacionr/mfc-news/actions/workflows/build.yml)
-[![UI Tests and Snapshots](https://github.com/ignacionr/mfc-news/actions/workflows/ui_tests.yml/badge.svg)](https://github.com/ignacionr/mfc-news/actions/workflows/ui_tests.yml)
+[![CI Build and Tests](https://github.com/ignacionr/mfc-news/actions/workflows/ci.yml/badge.svg)](https://github.com/ignacionr/mfc-news/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20(via%20CrossOver)-blue)
 ![C++ Standard](https://img.shields.io/badge/C%2B%2B-20-orange)
 
