@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include <utility>
 #include <string>
@@ -21,6 +22,7 @@ public:
 	
 	const std::vector<std::pair<CString, CString>>& GetFeeds() const { return m_feeds; }
 	const std::vector<media::rss::feed_item>& GetItems() const { return m_items; }
+	CString GetFeedIconPath(const CString& feedUrl);
 
 public:
 	virtual ~CMfcNewsDoc();
@@ -32,8 +34,10 @@ public:
 protected:
 	std::vector<std::pair<CString, CString>> m_feeds; // Pair of <Title, URL>
 	std::vector<media::rss::feed_item> m_items;
+	std::map<CString, CString> m_feed_icons; // Map of <Feed URL, Local Icon File Path>
 
 	std::string DownloadFeedUrl(const CString& url);
+	std::vector<BYTE> DownloadBinaryUrl(const CString& url);
 
 	DECLARE_MESSAGE_MAP()
 };

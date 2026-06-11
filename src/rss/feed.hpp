@@ -151,6 +151,8 @@ namespace media::rss {
                         } else {
                             new_item.updated = std::chrono::system_clock::now();
                         }
+                        new_item.feed_title = feed_title;
+                        new_item.feed_icon_url = image_url();
                         items.emplace_back(std::move(new_item));
                     }
                 }
@@ -248,6 +250,8 @@ namespace media::rss {
                     } else {
                         new_item.updated = std::chrono::system_clock::now();
                     }
+                    new_item.feed_title = feed_title;
+                    new_item.feed_icon_url = image_url();
                     items.emplace_back(std::move(new_item));
                 }
             }

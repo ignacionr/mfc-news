@@ -26,6 +26,8 @@ public:
 #endif
 
 protected:
+	CImageList m_imageList;
+
 	afx_msg void OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnFeedAdd();
 	afx_msg void OnFeedRefresh();

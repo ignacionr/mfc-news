@@ -13,6 +13,9 @@ namespace media::rss {
         std::string description;
         std::string enclosure;
         std::string image_url;
+        std::string feed_title;
+        std::string feed_icon_url;
+        std::string feed_url;
         std::chrono::system_clock::time_point updated;
         std::vector<media::html::extracted_media> extracted_media_urls;
         

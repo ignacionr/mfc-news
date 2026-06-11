@@ -4,6 +4,8 @@
 #include "mfc_newsView.h"
 #include "MainFrm.h"
 #include "ArticleView.h"
+#include <map>
+#include <atlimage.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,6 +61,64 @@ BOOL CMfcNewsView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+static void DrawDefaultRssIcon(CDC* pDC, const CRect& rect)
+{
+	// Draw a beautiful orange RSS icon!
+	// Background: rounded orange rectangle
+	CBrush orangeBrush(RGB(242, 101, 34));
+	CBrush* pOldBrush = pDC->SelectObject(&orangeBrush);
+	CPen orangePen(PS_SOLID, 1, RGB(242, 101, 34));
+	CPen* pOldPen = pDC->SelectObject(&orangePen);
+	pDC->RoundRect(rect, CPoint(4, 4));
+	
+	// Dot at bottom-left: (4, 12) to (7, 15)
+	CBrush whiteBrush(RGB(255, 255, 255));
+	pDC->SelectObject(&whiteBrush);
+	CPen whitePen(PS_SOLID, 1, RGB(255, 255, 255));
+	pDC->SelectObject(&whitePen);
+	pDC->Ellipse(rect.left + 3, rect.bottom - 6, rect.left + 6, rect.bottom - 3);
+	
+	// Draw two arcs:
+	pDC->SelectStockObject(NULL_BRUSH);
+	
+	CPen arcPen(PS_SOLID, 2, RGB(255, 255, 255));
+	pDC->SelectObject(&arcPen);
+	
+	// Small arc
+	pDC->Arc(rect.left + 1, rect.bottom - 11, rect.left + 9, rect.bottom - 3,
+	         rect.left + 1, rect.bottom - 7, rect.left + 5, rect.bottom - 3);
+	         
+	// Large arc
+	pDC->Arc(rect.left - 1, rect.bottom - 15, rect.left + 13, rect.bottom - 1,
+	         rect.left - 1, rect.bottom - 9, rect.left + 7, rect.bottom - 1);
+	
+	pDC->SelectObject(pOldBrush);
+	pDC->SelectObject(pOldPen);
+}
+
+static HBITMAP CreateResizedBitmap(CImage& img, int width, int height)
+{
+	CDC* pDC = CDC::FromHandle(::GetDC(NULL));
+	CDC memDC;
+	memDC.CreateCompatibleDC(pDC);
+	
+	CBitmap bmp;
+	bmp.CreateCompatibleBitmap(pDC, width, height);
+	CBitmap* pOldBmp = memDC.SelectObject(&bmp);
+	
+	CRect rect(0, 0, width, height);
+	memDC.FillSolidRect(&rect, ::GetSysColor(COLOR_WINDOW));
+	
+	int oldMode = SetStretchBltMode(memDC.GetSafeHdc(), HALFTONE);
+	img.Draw(memDC.GetSafeHdc(), rect);
+	SetStretchBltMode(memDC.GetSafeHdc(), oldMode);
+	
+	memDC.SelectObject(pOldBmp);
+	::ReleaseDC(NULL, pDC->GetSafeHdc());
+	
+	return (HBITMAP)bmp.Detach();
+}
+
 void CMfcNewsView::OnInitialUpdate()
 {
 	WriteDebugLog("[DEBUG] CMfcNewsView::OnInitialUpdate start");
@@ -66,6 +126,10 @@ void CMfcNewsView::OnInitialUpdate()
 
 	CListCtrl& listCtrl = GetListCtrl();
 	listCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER);
+
+	// Setup image list
+	m_imageList.Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 4);
+	listCtrl.SetImageList(&m_imageList, LVSIL_SMALL);
 
 	listCtrl.InsertColumn(0, _T("Title"), LVCFMT_LEFT, 240);
 	listCtrl.InsertColumn(1, _T("Date"), LVCFMT_LEFT, 110);
@@ -104,13 +168,77 @@ void CMfcNewsView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHi
 		return;
 	}
 
+	// Recreate image list to prevent growing/leaks
+	m_imageList.DeleteImageList();
+	m_imageList.Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 4);
+	listCtrl.SetImageList(&m_imageList, LVSIL_SMALL);
+
+	// Add default RSS icon at index 0
+	{
+		CDC* pScreenDC = CDC::FromHandle(::GetDC(NULL));
+		CDC memDC;
+		memDC.CreateCompatibleDC(pScreenDC);
+		CBitmap bmpDefault;
+		bmpDefault.CreateCompatibleBitmap(pScreenDC, 16, 16);
+		CBitmap* pOldBmp = memDC.SelectObject(&bmpDefault);
+		
+		CRect rect(0, 0, 16, 16);
+		memDC.FillSolidRect(&rect, ::GetSysColor(COLOR_WINDOW));
+		DrawDefaultRssIcon(&memDC, rect);
+		
+		memDC.SelectObject(pOldBmp);
+		::ReleaseDC(NULL, pScreenDC->GetSafeHdc());
+		
+		m_imageList.Add(&bmpDefault, RGB(255, 255, 255));
+	}
+
+	std::map<std::string, int> feedToImageIndex;
+
 	const auto& items = pDoc->GetItems();
 	for (size_t i = 0; i < items.size(); ++i)
 	{
-		CString title = Utf8ToCString(items[i].title);
-		int index = listCtrl.InsertItem((int)i, title);
+		const auto& item = items[i];
+		int imageIndex = 0; // Default RSS icon
 
-		std::time_t t = std::chrono::system_clock::to_time_t(items[i].updated);
+		if (!item.feed_url.empty())
+		{
+			auto it = feedToImageIndex.find(item.feed_url);
+			if (it != feedToImageIndex.end())
+			{
+				imageIndex = it->second;
+			}
+			else
+			{
+				// Try to load the feed icon
+				CString feedUrl = Utf8ToCString(item.feed_url);
+				CString iconPath = pDoc->GetFeedIconPath(feedUrl);
+				if (!iconPath.IsEmpty())
+				{
+					CImage img;
+					if (SUCCEEDED(img.Load(iconPath)))
+					{
+						HBITMAP hBmp = CreateResizedBitmap(img, 16, 16);
+						if (hBmp)
+						{
+							CBitmap bmp;
+							bmp.Attach(hBmp);
+							imageIndex = m_imageList.Add(&bmp, RGB(255, 255, 255));
+							feedToImageIndex[item.feed_url] = imageIndex;
+						}
+					}
+				}
+				
+				if (imageIndex == 0)
+				{
+					feedToImageIndex[item.feed_url] = 0;
+				}
+			}
+		}
+
+		CString title = Utf8ToCString(item.title);
+		int index = listCtrl.InsertItem((int)i, title, imageIndex);
+
+		std::time_t t = std::chrono::system_clock::to_time_t(item.updated);
 		std::tm tm;
 		localtime_s(&tm, &t);
 		wchar_t buf[64];

@@ -119,8 +119,41 @@ void CArticleView::SetArticle(const media::rss::feed_item& item)
 	html += "    font-weight: 600;\n";
 	html += "    margin-bottom: 15px;\n";
 	html += "  }\n";
+	html += "  .feed-source {\n";
+	html += "    margin-bottom: 15px;\n";
+	html += "    line-height: 20px;\n";
+	html += "  }\n";
+	html += "  .feed-icon-img, .feed-icon-svg {\n";
+	html += "    width: 20px;\n";
+	html += "    height: 20px;\n";
+	html += "    border-radius: 4px;\n";
+	html += "    vertical-align: middle;\n";
+	html += "    margin-right: 8px;\n";
+	html += "    display: inline-block;\n";
+	html += "  }\n";
+	html += "  .feed-name {\n";
+	html += "    font-size: 14px;\n";
+	html += "    font-weight: 600;\n";
+	html += "    color: #495057;\n";
+	html += "    vertical-align: middle;\n";
+	html += "    display: inline-block;\n";
+	html += "  }\n";
 	html += "</style>\n</head>\n<body>\n";
 	html += "<div class=\"article-card\">\n";
+	if (!item.feed_title.empty())
+	{
+		html += "  <div class=\"feed-source\">\n";
+		if (!item.feed_icon_url.empty())
+		{
+			html += "    <img class=\"feed-icon-img\" src=\"" + item.feed_icon_url + "\" onerror=\"this.outerHTML='<svg class=\\'feed-icon-svg\\' viewBox=\\'0 0 24 24\\'><rect width=\\'24\\' height=\\'24\\' rx=\\'6\\' fill=\\'#f26522\\'/><circle cx=\\'6\\' cy=\\'18\\' r=\\'2\\' fill=\\'#fff\\'/><path d=\\'M 4 4 A 20 20 0 0 1 24 24 h -3 A 17 17 0 0 0 4 7 Z\\' fill=\\'#fff\\'/><path d=\\'M 4 11 A 13 13 0 0 1 17 24 h -3 A 10 10 0 0 0 4 14 Z\\' fill=\\'#fff\\'/></svg>';\" />\n";
+		}
+		else
+		{
+			html += "    <svg class=\"feed-icon-svg\" viewBox=\"0 0 24 24\"><rect width=\"24\" height=\"24\" rx=\"6\" fill=\"#f26522\"/><circle cx=\"6\" cy=\"18\" r=\"2\" fill=\"#fff\"/><path d=\"M 4 4 A 20 20 0 0 1 24 24 h -3 A 17 17 0 0 0 4 7 Z\" fill=\"#fff\"/><path d=\"M 4 11 A 13 13 0 0 1 17 24 h -3 A 10 10 0 0 0 4 14 Z\" fill=\"#fff\"/></svg>\n";
+		}
+		html += "    <span class=\"feed-name\">" + item.feed_title + "</span>\n";
+		html += "  </div>\n";
+	}
 
 	if (item.has_media())
 	{
