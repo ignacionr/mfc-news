@@ -38,6 +38,7 @@ BOOL CMfcNewsDoc::OnNewDocument()
 	m_feeds.clear();
 	m_feeds.emplace_back(_T("BBC News"), _T("http://feeds.bbci.co.uk/news/rss.xml"));
 	m_feeds.emplace_back(_T("NASA Breaking News"), _T("https://www.nasa.gov/news-release/feed/"));
+	m_feeds.emplace_back(_T("Los Temas del Día"), _T("https://www.spreaker.com/show/4209606/episodes/feed"));
 	
 	WriteDebugLog("[DEBUG] RefreshAllFeeds start");
 	// Refresh automatically on startup
