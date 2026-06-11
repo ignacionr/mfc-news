@@ -165,10 +165,9 @@ void CArticleView::SetArticle(const media::rss::feed_item& item)
 	std::time_t t = std::chrono::system_clock::to_time_t(item.updated);
 	std::tm tm_info;
 	localtime_s(&tm_info, &t);
-	wchar_t date_buf[64];
-	wcsftime(date_buf, 64, L"%Y-%m-%d %H:%M:%S", &tm_info);
-	std::wstring wdate(date_buf);
-	std::string date_str(wdate.begin(), wdate.end());
+	char date_buf[64];
+	strftime(date_buf, 64, "%Y-%m-%d %H:%M:%S", &tm_info);
+	std::string date_str(date_buf);
 
 	html += "  <div class=\"meta\">\n";
 	html += "    Published: " + date_str + " | <a href=\"" + item.link + "\" target=\"_blank\">Open in Browser</a>\n";
